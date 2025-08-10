@@ -263,4 +263,5 @@ For support, email support@yourapp.com or create an issue on GitHub.
 - Remove.bg for AI background removal API
 - Replit for hosting and authentication services
 - Shadcn/ui for beautiful component library
-- All the open-source libraries that make this project possible
+- All the open-source libraries that make this project possible#   A N D R O I D - - - P a s s p o r t - p h o t o - m a k e r  
+ 
