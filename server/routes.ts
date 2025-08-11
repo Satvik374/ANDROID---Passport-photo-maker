@@ -43,6 +43,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
+      console.log('Auth check - Session ID:', req.sessionID);
+      console.log('Auth check - User in session:', !!req.user, req.user?.id);
       // req.user now contains the full user object from Google auth
       res.json(req.user);
     } catch (error) {
@@ -173,7 +175,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/login', async (req, res) => {
     try {
       const loginData = emailLoginSchema.parse(req.body);
+      console.log('Login attempt for email:', loginData.email);
+      
       const result = await EmailAuthService.loginUser(loginData);
+      console.log('Login result:', { success: result.success, message: result.message });
       
       if (result.success && result.user) {
         // Set user session

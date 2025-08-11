@@ -89,16 +89,7 @@ export const REQUIRED_SECRETS: SecretConfig[] = [
     description: 'The Replit app URL for OAuth redirects',
     required: false
   },
-  {
-    key: 'MAILJET_API_KEY',
-    description: 'Mailjet API key for email services',
-    required: false
-  },
-  {
-    key: 'MAILJET_API_SECRET',
-    description: 'Mailjet API secret for email services',
-    required: false
-  },
+
   {
     key: 'GMAIL_USER',
     description: 'Gmail address for sending verification emails',
@@ -151,6 +142,14 @@ export class SecretsManager {
         this.secrets.set(config.key, envValue.trim());
       }
     });
+
+    // Force check for Google OAuth credentials from Replit Secrets
+    if (process.env.GOOGLE_CLIENT_ID) {
+      this.secrets.set('GOOGLE_CLIENT_ID', process.env.GOOGLE_CLIENT_ID.trim());
+    }
+    if (process.env.GOOGLE_CLIENT_SECRET) {
+      this.secrets.set('GOOGLE_CLIENT_SECRET', process.env.GOOGLE_CLIENT_SECRET.trim());
+    }
 
     // Also check for common Replit environment variables
     const replitEnvMappings = [

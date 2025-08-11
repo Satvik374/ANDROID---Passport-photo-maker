@@ -54,8 +54,17 @@ export function autoSetupSecrets(): void {
     console.log('✅ DATABASE_URL automatically configured from Replit environment');
   }
   
-  // Set the correct Replit app URL
-  const correctReplitUrl = 'https://627846c6-9a01-430d-ad44-d2681f586ed6-00-3fa36lqk65xc4.pike.replit.dev';
+  // Set the correct Replit app URL based on current workspace
+  let correctReplitUrl = process.env.REPLIT_URL;
+  if (!correctReplitUrl && process.env.REPL_OWNER && process.env.REPL_SLUG) {
+    // Generate URL from workspace info
+    correctReplitUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+  }
+  if (!correctReplitUrl) {
+    // Fallback to the original URL if nothing else works
+    correctReplitUrl = 'https://627846c6-9a01-430d-ad44-d2681f586ed6-00-3fa36lqk65xc4.pike.replit.dev';
+  }
+  
   if (!secretsManager.hasSecret('REPLIT_APP_URL')) {
     secretsManager.setSecret('REPLIT_APP_URL', correctReplitUrl);
     console.log('✅ REPLIT_APP_URL configured:', correctReplitUrl);
@@ -89,7 +98,6 @@ export function autoSetupSecrets(): void {
     console.log(`✅ ${secretKey} updated`);
   });
   
-  console.log('📝 To complete setup, add these optional secrets in the Secrets tab:');
-  console.log('  • REMOVE_BG_API_KEY_1-10: For background removal (get from remove.bg)');
-  console.log('  • GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET: For Google authentication');
+  console.log('📝 Optional: Add SMTP email credentials for email verification:');
+  console.log('  • GMAIL_USER & GMAIL_APP_PASSWORD: For Gmail SMTP email service');
 }
