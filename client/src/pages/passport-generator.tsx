@@ -18,6 +18,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { User } from "@shared/schema";
 import { PageTransition } from "@/components/ui/loading-screen";
+import { NativeBanner } from "@/components/AdBanner";
+import { SidebarAdBanner } from "@/components/SidebarAdBanner";
+import { LeftHighPerformanceBanner } from "@/components/LeftHighPerformanceBanner";
+import { RightHighPerformanceBanner } from "@/components/RightHighPerformanceBanner";
+import { DirectLinkAd } from "@/components/DirectLinkAd";
 
 export default function PassportGenerator() {
   const { toast } = useToast();
@@ -773,7 +778,26 @@ export default function PassportGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted relative">
+      {/* Left Sidebar Ad */}
+      <SidebarAdBanner 
+        position="left"
+        containerId="container-e1ff802a0bf99100990e2f442ac0d82e-left-edit"
+        scriptSrc="https://pl27394978.profitableratecpm.com/e1ff802a0bf99100990e2f442ac0d82e/invoke.js"
+      />
+
+      {/* Right Sidebar Ad */}
+      <SidebarAdBanner 
+        position="right"
+        containerId="container-e1ff802a0bf99100990e2f442ac0d82e-right-edit"
+        scriptSrc="https://pl27394978.profitableratecpm.com/e1ff802a0bf99100990e2f442ac0d82e/invoke.js"
+      />
+
+      {/* High Performance Banner - Left */}
+      <LeftHighPerformanceBanner />
+
+      {/* High Performance Banner - Right */}
+      <RightHighPerformanceBanner />
       {/* Header */}
       <header className="bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border-b border-border/50 dark:border-slate-700/50 shadow-card dark:shadow-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -830,6 +854,11 @@ export default function PassportGenerator() {
           </div>
         </div>
       </header>
+
+      {/* Native Banner */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <NativeBanner />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1319,6 +1348,22 @@ export default function PassportGenerator() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Direct Link Ad */}
+            <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
+              <CardContent className="p-4">
+                <DirectLinkAd 
+                  style="button" 
+                  text="⚡ Discover Premium Features"
+                  className="w-full text-center justify-center"
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Additional Native Banner between sections */}
+          <div className="lg:col-span-2 mb-6">
+            <NativeBanner />
           </div>
 
           {/* Right Panel: A4 Preview */}

@@ -63,7 +63,7 @@ export function SidebarAdBanner({ position, containerId, scriptSrc }: SidebarAdB
   }, [scriptSrc, position]);
 
   return (
-    <div className={`hidden xl:block fixed top-1/2 transform -translate-y-1/2 ${position === 'left' ? 'left-4' : 'right-4'} w-40 z-10`}>
+    <div className={`hidden 3xl:block fixed top-1/2 transform -translate-y-1/2 ${position === 'left' ? 'left-0' : 'right-0'} w-40 z-10`}>
       {isProduction ? (
         <div id={containerId} className="min-h-[600px]"></div>
       ) : (

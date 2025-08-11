@@ -11,7 +11,9 @@ import { EmailLogin } from "@/components/auth/EmailLogin.tsx";
 import { LoadingScreen, PageTransition } from "@/components/ui/loading-screen";
 import { NativeBanner } from "@/components/AdBanner";
 import { SidebarAdBanner } from "@/components/SidebarAdBanner";
-import { HighPerformanceBanner } from "@/components/HighPerformanceBanner";
+import { LeftHighPerformanceBanner } from "@/components/LeftHighPerformanceBanner";
+import { RightHighPerformanceBanner } from "@/components/RightHighPerformanceBanner";
+import { DirectLinkAd } from "@/components/DirectLinkAd";
 
 export default function Landing() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -79,16 +81,10 @@ export default function Landing() {
       />
 
       {/* High Performance Banner - Left */}
-      <HighPerformanceBanner 
-        position="left"
-        bannerId="hp-banner-left"
-      />
+      <LeftHighPerformanceBanner />
 
       {/* High Performance Banner - Right */}
-      <HighPerformanceBanner 
-        position="right"
-        bannerId="hp-banner-right"
-      />
+      <RightHighPerformanceBanner />
 
       {/* Native Banner at top */}
       <NativeBanner />
@@ -147,7 +143,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-44 py-8 sm:py-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         {/* Hero */}
         <div className="text-center mb-16">
           <div className="mb-8">
@@ -274,6 +270,15 @@ export default function Landing() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Direct Link Ad */}
+        <div className="mb-12 text-center">
+          <DirectLinkAd 
+            style="banner" 
+            text="🎯 Discover Premium Services - Click Here for Exclusive Offers"
+            className="mx-auto max-w-lg"
+          />
         </div>
 
         {/* CTA Section */}
