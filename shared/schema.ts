@@ -21,7 +21,7 @@ export const photoSettingsSchema = z.object({
     'down-right'
   ]).default('auto'),
   spacing: z.number().min(0).max(20).default(5),
-  topMargin: z.number().min(0).max(20).default(10),
+  topMargin: z.number().min(5).max(50).default(10),
 });
 
 // Crop settings schema
@@ -103,6 +103,18 @@ export const emailVerifications = pgTable("email_verifications", {
   verificationCode: varchar("verification_code").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   used: boolean("used").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Pending registrations table - stores registration data before email verification
+export const pendingRegistrations = pgTable("pending_registrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  passwordHash: varchar("password_hash").notNull(),
+  verificationCode: varchar("verification_code").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -196,6 +208,11 @@ export const insertEmailVerificationSchema = createInsertSchema(emailVerificatio
   createdAt: true,
 });
 
+export const insertPendingRegistrationSchema = createInsertSchema(pendingRegistrations).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type PhotoSettings = z.infer<typeof photoSettingsSchema>;
 export type CropSettings = z.infer<typeof cropSettingsSchema>;
@@ -211,6 +228,8 @@ export type Preset = typeof presets.$inferSelect;
 export type InsertPreset = z.infer<typeof insertPresetSchema>;
 export type EmailVerification = typeof emailVerifications.$inferSelect;
 export type InsertEmailVerification = z.infer<typeof insertEmailVerificationSchema>;
+export type PendingRegistration = typeof pendingRegistrations.$inferSelect;
+export type InsertPendingRegistration = z.infer<typeof insertPendingRegistrationSchema>;
 
 // Email authentication types
 export type EmailSignup = z.infer<typeof emailSignupSchema>;
