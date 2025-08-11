@@ -860,18 +860,18 @@ export default function PassportGenerator() {
         <NativeBanner />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-6 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 min-h-[calc(100vh-200px)]">
           
-          {/* Left Panel: Upload and Controls */}
+          {/* Left Panel: Upload and Basic Settings */}
           <div className="space-y-6">
             
             {/* Image Upload */}
             <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                  <div className="bg-gradient-primary p-2 rounded-lg mr-3 shadow-primary">
-                    <Upload className="text-white h-5 w-5" />
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center">
+                  <div className="bg-gradient-primary p-3 rounded-lg mr-4 shadow-primary">
+                    <Upload className="text-white h-6 w-6" />
                   </div>
                   Upload Your Photo
                 </h2>
@@ -887,11 +887,11 @@ export default function PassportGenerator() {
 
             {/* Presets Section */}
             <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center justify-between">
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center justify-between">
                   <span className="flex items-center">
-                    <div className="bg-gradient-primary p-2 rounded-lg mr-3 shadow-primary">
-                      <BookOpen className="text-white h-5 w-5" />
+                    <div className="bg-gradient-primary p-3 rounded-lg mr-4 shadow-primary">
+                      <BookOpen className="text-white h-6 w-6" />
                     </div>
                     Saved Presets
                   </span>
@@ -991,21 +991,21 @@ export default function PassportGenerator() {
 
             {/* Photo Controls */}
             <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                  <div className="bg-gradient-primary p-2 rounded-lg mr-3 shadow-primary">
-                    <Settings className="text-white h-5 w-5" />
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center">
+                  <div className="bg-gradient-primary p-3 rounded-lg mr-4 shadow-primary">
+                    <Settings className="text-white h-6 w-6" />
                   </div>
                   Photo Settings
                 </h2>
                 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {/* Dimensions */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 block">Photo Dimensions (mm)</Label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <Label className="text-lg font-medium text-gray-700 dark:text-slate-300 mb-4 block">Photo Dimensions (mm)</Label>
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label className="text-xs text-gray-600 dark:text-slate-400 mb-1 block">Width</Label>
+                        <Label className="text-sm text-gray-600 dark:text-slate-400 mb-2 block">Width</Label>
                         <div className="relative">
                           <Input
                             type="number"
@@ -1013,13 +1013,13 @@ export default function PassportGenerator() {
                             min={10}
                             max={100}
                             onChange={(e) => setPhotoSettings(prev => ({ ...prev, width: parseInt(e.target.value) || 35 }))}
-                            className="pr-8"
+                            className="pr-10 h-12 text-lg"
                           />
-                          <span className="absolute right-3 top-2 text-sm text-gray-500 dark:text-slate-400">mm</span>
+                          <span className="absolute right-3 top-3 text-md text-gray-500 dark:text-slate-400">mm</span>
                         </div>
                       </div>
                       <div>
-                        <Label className="text-xs text-gray-600 dark:text-slate-400 mb-1 block">Height</Label>
+                        <Label className="text-sm text-gray-600 dark:text-slate-400 mb-2 block">Height</Label>
                         <div className="relative">
                           <Input
                             type="number"
@@ -1027,34 +1027,34 @@ export default function PassportGenerator() {
                             min={10}
                             max={150}
                             onChange={(e) => setPhotoSettings(prev => ({ ...prev, height: parseInt(e.target.value) || 45 }))}
-                            className="pr-8"
+                            className="pr-10 h-12 text-lg"
                           />
-                          <span className="absolute right-3 top-2 text-sm text-gray-500 dark:text-slate-400">mm</span>
+                          <span className="absolute right-3 top-3 text-md text-gray-500 dark:text-slate-400">mm</span>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="mt-4 grid grid-cols-3 gap-3">
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="default"
                         onClick={() => setPresetSize(35, 45)}
-                        className="text-xs bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
+                        className="text-sm py-3 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
                       >
                         Passport (35×45)
                       </Button>
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="default"
                         onClick={() => setPresetSize(51, 51)}
-                        className="text-xs bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
+                        className="text-sm py-3 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
                       >
                         Visa (51×51)
                       </Button>
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="default"
                         onClick={() => setPresetSize(25, 35)}
-                        className="text-xs bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
+                        className="text-sm py-3 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/20 hover:to-primary/10"
                       >
                         ID Card (25×35)
                       </Button>
@@ -1063,11 +1063,11 @@ export default function PassportGenerator() {
 
                   {/* Layout Position */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">Layout Position</Label>
+                    <Label className="text-lg font-medium text-gray-700 dark:text-slate-300 mb-4">Layout Position</Label>
                     <select
                       value={photoSettings.layout}
                       onChange={(e) => setPhotoSettings(prev => ({ ...prev, layout: e.target.value as any }))}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 text-sm bg-white dark:bg-black text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 text-lg bg-white dark:bg-black text-gray-900 dark:text-white h-12"
                     >
                       <option value="auto">Auto Layout</option>
                       <optgroup label="Top Positions">
@@ -1197,85 +1197,22 @@ export default function PassportGenerator() {
                     </div>
                   </div>
 
-                  {/* Background Settings */}
+                  {/* Auto Preview Settings */}
                   <div className="border-t pt-6">
-                    <Label className="text-sm font-medium text-gray-700 mb-4 flex items-center">
-                      <Scissors className="text-primary mr-2 h-4 w-4" />
-                      Background Settings
+                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-4 flex items-center">
+                      <SearchCheck className="text-primary mr-2 h-4 w-4" />
+                      Preview Settings
                     </Label>
                     
-                    <div className="space-y-4">
-                      {/* Background Removal Toggle */}
-                      <div className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex-1">
-                          <Label className="text-sm font-medium">Remove Background</Label>
-                          <p className="text-xs text-gray-600 mt-1">Use AI to automatically remove the photo background</p>
-                        </div>
-                        <Switch
-                          checked={backgroundSettings.removeBackground}
-                          onCheckedChange={(checked) => 
-                            setBackgroundSettings(prev => ({ ...prev, removeBackground: checked }))
-                          }
-                        />
+                    <div className="flex items-center justify-between p-3 border rounded-lg dark:border-slate-600">
+                      <div className="flex-1">
+                        <Label className="text-sm font-medium">Auto Preview</Label>
+                        <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">Automatically update preview when settings change</p>
                       </div>
-
-                      {/* Background Removal Button */}
-                      {uploadedImage && !backgroundRemovedUrl && (
-                        <Button
-                          onClick={() => backgroundRemovalMutation.mutate({ 
-                            imageId: uploadedImage.id, 
-                            backgroundColor: backgroundSettings.backgroundColor 
-                          })}
-                          className="w-full"
-                          variant="outline"
-                        >
-                          <Scissors className="h-4 w-4 mr-2" />
-                          Remove Background
-                        </Button>
-                      )}
-
-                      {/* Background Removed Status */}
-                      {backgroundRemovedUrl && (
-                        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                          <div className="flex items-center">
-                            <SearchCheck className="h-4 w-4 text-green-600 mr-2" />
-                            <span className="text-sm text-green-800 font-medium">Background removed successfully!</span>
-                          </div>
-                          <p className="text-xs text-green-700 mt-1">All new layouts will use the background-removed image.</p>
-                        </div>
-                      )}
-
-                      {/* Background Color Picker */}
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <Palette className="text-primary mr-2 h-4 w-4" />
-                          Background Color
-                        </Label>
-                        <div className="flex items-center space-x-3">
-                          <Input
-                            type="color"
-                            value={backgroundSettings.backgroundColor}
-                            onChange={(e) => setBackgroundSettings(prev => ({ 
-                              ...prev, 
-                              backgroundColor: e.target.value 
-                            }))}
-                            className="w-16 h-10 border rounded cursor-pointer"
-                          />
-                          <Input
-                            type="text"
-                            value={backgroundSettings.backgroundColor}
-                            onChange={(e) => setBackgroundSettings(prev => ({ 
-                              ...prev, 
-                              backgroundColor: e.target.value 
-                            }))}
-                            placeholder="#ffffff"
-                            className="flex-1"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-600 mt-1">
-                          Choose the background color for removed backgrounds
-                        </p>
-                      </div>
+                      <Switch
+                        checked={autoPreview}
+                        onCheckedChange={setAutoPreview}
+                      />
                     </div>
                   </div>
                 </div>
@@ -1298,40 +1235,10 @@ export default function PassportGenerator() {
                   </div>
                   
                   <div className="space-y-4">
-                    <Button
-                      onClick={handleDownloadPdf}
-                      disabled={!layoutResult}
-                      className="w-full bg-gradient-primary hover:opacity-90 text-white shadow-primary transition-all duration-200 transform hover:scale-[1.02]"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download PDF for Printing
-                    </Button>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button 
-                        onClick={() => handleDownloadImage('png')}
-                        disabled={!layoutResult}
-                        variant="outline"
-                        className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-600/50 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/40 dark:hover:to-blue-700/40 text-blue-700 dark:text-blue-300"
-                      >
-                        <Download className="mr-1 h-4 w-4" />
-                        PNG
-                      </Button>
-                      
-                      <Button 
-                        onClick={() => handleDownloadImage('jpg')}
-                        disabled={!layoutResult}
-                        variant="outline"
-                        className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-green-200 dark:border-green-600/50 hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/40 dark:hover:to-green-700/40 text-green-700 dark:text-green-300"
-                      >
-                        <Download className="mr-1 h-4 w-4" />
-                        JPG
-                      </Button>
+                    <div className="text-center p-4 border rounded-lg bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-600">
+                      <div className="text-sm text-gray-600 dark:text-slate-400 mb-2">Ready to download?</div>
+                      <div className="text-xs text-gray-500 dark:text-slate-500">Use the export options in the right panel to download your photos in PDF, PNG, or JPG format</div>
                     </div>
-                    
-                    <p className="text-xs text-muted-foreground text-center">
-                      PDF for printing, PNG for transparency, JPG for smaller files
-                    </p>
                   </div>
                   
                   <div className="text-center">
@@ -1361,12 +1268,7 @@ export default function PassportGenerator() {
             </Card>
           </div>
 
-          {/* Additional Native Banner between sections */}
-          <div className="lg:col-span-2 mb-6">
-            <NativeBanner />
-          </div>
-
-          {/* Right Panel: A4 Preview */}
+          {/* Center Panel: A4 Preview */}
           <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center justify-between">
@@ -1476,246 +1378,7 @@ export default function PassportGenerator() {
                 </div>
               )}
 
-              {/* Crop and Position Tools */}
-              {uploadedImage && (
-                <div className="mt-6 border-t pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Crop className="text-primary mr-2 h-5 w-5" />
-                    Crop & Position Tools
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    {/* Position Controls */}
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">Position</Label>
-                      <div className="space-y-3">
-                        <div>
-                          <Label htmlFor="cropX" className="text-xs text-gray-600">X Position: {cropSettings.x}%</Label>
-                          <Slider
-                            id="cropX"
-                            min={-50}
-                            max={50}
-                            step={1}
-                            value={[cropSettings.x]}
-                            onValueChange={(value) => handleCropChange('x', value[0])}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cropY" className="text-xs text-gray-600">Y Position: {cropSettings.y}%</Label>
-                          <Slider
-                            id="cropY"
-                            min={-50}
-                            max={50}
-                            step={1}
-                            value={[cropSettings.y]}
-                            onValueChange={(value) => handleCropChange('y', value[0])}
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Scale and Rotation Controls */}
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">Transform</Label>
-                      <div className="space-y-3">
-                        <div>
-                          <Label htmlFor="cropScale" className="text-xs text-gray-600">Scale: {cropSettings.scale.toFixed(2)}x</Label>
-                          <Slider
-                            id="cropScale"
-                            min={0.5}
-                            max={3}
-                            step={0.1}
-                            value={[cropSettings.scale]}
-                            onValueChange={(value) => handleCropChange('scale', value[0])}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cropRotation" className="text-xs text-gray-600">Rotation: {cropSettings.rotation}°</Label>
-                          <Slider
-                            id="cropRotation"
-                            min={-180}
-                            max={180}
-                            step={1}
-                            value={[cropSettings.rotation]}
-                            onValueChange={(value) => handleCropChange('rotation', value[0])}
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Crop Size Controls */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="cropWidth" className="text-xs text-gray-600">Crop Width: {cropSettings.width}%</Label>
-                      <Slider
-                        id="cropWidth"
-                        min={20}
-                        max={100}
-                        step={1}
-                        value={[cropSettings.width]}
-                        onValueChange={(value) => handleCropChange('width', value[0])}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cropHeight" className="text-xs text-gray-600">Crop Height: {cropSettings.height}%</Label>
-                      <Slider
-                        id="cropHeight"
-                        min={20}
-                        max={100}
-                        step={1}
-                        value={[cropSettings.height]}
-                        onValueChange={(value) => handleCropChange('height', value[0])}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex gap-2 flex-wrap mb-4">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={resetCrop}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-1" />
-                      Reset
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleCropChange('rotation', cropSettings.rotation + 90)}
-                    >
-                      <Rotate className="h-4 w-4 mr-1" />
-                      Rotate 90°
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setCropSettings(prev => ({
-                          ...prev,
-                          width: photoSettings.width / photoSettings.height * 100,
-                          height: 100
-                        }));
-                      }}
-                    >
-                      <Crop className="h-4 w-4 mr-1" />
-                      Fit to Ratio
-                    </Button>
-                    <Button 
-                      size="sm"
-                      onClick={handleSaveCroppedPhoto}
-                      disabled={!uploadedImage}
-                      className="bg-primary text-white hover:bg-primary/90"
-                    >
-                      <Save className="h-4 w-4 mr-1" />
-                      Save Cropped Photo
-                    </Button>
-                  </div>
-
-                  {/* Live Preview with Crop Overlay */}
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <Label className="text-sm font-medium mb-2 block">Crop Preview - Drag to Move, Resize Corners</Label>
-                    <div 
-                      ref={cropPreviewRef}
-                      className="relative mx-auto bg-white border-2 border-dashed border-gray-300 rounded select-none" 
-                      style={{ 
-                        width: '200px', 
-                        height: `${200 * (photoSettings.height / photoSettings.width)}px`,
-                        maxHeight: '300px'
-                      }}
-                    >
-                      {uploadedImage && (
-                        <div className="absolute inset-0 overflow-hidden rounded">
-                          <img
-                            src={`/api/images/${uploadedImage.filename}`}
-                            alt="Crop preview"
-                            className="absolute pointer-events-none"
-                            style={{
-                              transform: `
-                                scale(${cropSettings.scale}) 
-                                rotate(${cropSettings.rotation}deg)
-                              `,
-                              transformOrigin: 'center',
-                              width: '100%',
-                              height: '100%',
-                              left: '0%',
-                              top: '0%',
-                              objectFit: 'cover'
-                            }}
-                          />
-                          {/* Interactive Crop frame overlay */}
-                          <div 
-                            className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-10 cursor-move"
-                            style={{
-                              left: `${(100 - cropSettings.width) / 2 + cropSettings.x / 2}%`,
-                              top: `${(100 - cropSettings.height) / 2 + cropSettings.y / 2}%`,
-                              width: `${cropSettings.width}%`,
-                              height: `${cropSettings.height}%`,
-                            }}
-                            onMouseDown={handleCropStart}
-                            onTouchStart={handleCropStart}
-                          >
-                            <div className="absolute -top-6 left-0 text-xs text-blue-600 bg-white px-1 rounded pointer-events-none">
-                              Drag to Move
-                            </div>
-                            
-                            {/* Resize handles */}
-                            <div 
-                              className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 border border-white cursor-nw-resize"
-                              onMouseDown={(e) => handleResizeStart(e, 'top-left')}
-                              onTouchStart={(e) => handleResizeStart(e, 'top-left')}
-                            />
-                            <div 
-                              className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border border-white cursor-ne-resize"
-                              onMouseDown={(e) => handleResizeStart(e, 'top-right')}
-                              onTouchStart={(e) => handleResizeStart(e, 'top-right')}
-                            />
-                            <div 
-                              className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 border border-white cursor-sw-resize"
-                              onMouseDown={(e) => handleResizeStart(e, 'bottom-left')}
-                              onTouchStart={(e) => handleResizeStart(e, 'bottom-left')}
-                            />
-                            <div 
-                              className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 border border-white cursor-se-resize"
-                              onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
-                              onTouchStart={(e) => handleResizeStart(e, 'bottom-right')}
-                            />
-                            
-                            {/* Edge handles */}
-                            <div 
-                              className="absolute -top-1 left-1/2 w-3 h-3 bg-blue-500 border border-white cursor-n-resize transform -translate-x-1/2"
-                              onMouseDown={(e) => handleResizeStart(e, 'top')}
-                              onTouchStart={(e) => handleResizeStart(e, 'top')}
-                            />
-                            <div 
-                              className="absolute -bottom-1 left-1/2 w-3 h-3 bg-blue-500 border border-white cursor-s-resize transform -translate-x-1/2"
-                              onMouseDown={(e) => handleResizeStart(e, 'bottom')}
-                              onTouchStart={(e) => handleResizeStart(e, 'bottom')}
-                            />
-                            <div 
-                              className="absolute -left-1 top-1/2 w-3 h-3 bg-blue-500 border border-white cursor-w-resize transform -translate-y-1/2"
-                              onMouseDown={(e) => handleResizeStart(e, 'left')}
-                              onTouchStart={(e) => handleResizeStart(e, 'left')}
-                            />
-                            <div 
-                              className="absolute -right-1 top-1/2 w-3 h-3 bg-blue-500 border border-white cursor-e-resize transform -translate-y-1/2"
-                              onMouseDown={(e) => handleResizeStart(e, 'right')}
-                              onTouchStart={(e) => handleResizeStart(e, 'right')}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
@@ -1759,6 +1422,412 @@ export default function PassportGenerator() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Right Panel: Advanced Settings & Controls */}
+        <div className="space-y-8">
+          
+          {/* Crop and Position Tools */}
+          {uploadedImage && (
+            <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center">
+                  <div className="bg-gradient-primary p-3 rounded-lg mr-4 shadow-primary">
+                    <Crop className="text-white h-6 w-6" />
+                  </div>
+                  Crop & Position
+                </h2>
+                
+                <div className="space-y-8">
+                  {/* Position Controls */}
+                  <div>
+                    <Label className="text-lg font-medium mb-4 block">Position Controls</Label>
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="cropX" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">X Position: {cropSettings.x}%</Label>
+                        <Slider
+                          id="cropX"
+                          min={-50}
+                          max={50}
+                          step={1}
+                          value={[cropSettings.x]}
+                          onValueChange={(value) => handleCropChange('x', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cropY" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">Y Position: {cropSettings.y}%</Label>
+                        <Slider
+                          id="cropY"
+                          min={-50}
+                          max={50}
+                          step={1}
+                          value={[cropSettings.y]}
+                          onValueChange={(value) => handleCropChange('y', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Transform Controls */}
+                  <div>
+                    <Label className="text-lg font-medium mb-4 block">Transform Controls</Label>
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="cropScale" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">Scale: {cropSettings.scale.toFixed(2)}x</Label>
+                        <Slider
+                          id="cropScale"
+                          min={0.5}
+                          max={3}
+                          step={0.1}
+                          value={[cropSettings.scale]}
+                          onValueChange={(value) => handleCropChange('scale', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cropRotation" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">Rotation: {cropSettings.rotation}°</Label>
+                        <Slider
+                          id="cropRotation"
+                          min={-180}
+                          max={180}
+                          step={1}
+                          value={[cropSettings.rotation]}
+                          onValueChange={(value) => handleCropChange('rotation', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Crop Size Controls */}
+                  <div>
+                    <Label className="text-lg font-medium mb-4 block">Crop Size</Label>
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="cropWidth" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">Width: {cropSettings.width}%</Label>
+                        <Slider
+                          id="cropWidth"
+                          min={20}
+                          max={100}
+                          step={1}
+                          value={[cropSettings.width]}
+                          onValueChange={(value) => handleCropChange('width', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cropHeight" className="text-sm text-gray-600 dark:text-slate-400 mb-3 block">Height: {cropSettings.height}%</Label>
+                        <Slider
+                          id="cropHeight"
+                          min={20}
+                          max={100}
+                          step={1}
+                          value={[cropSettings.height]}
+                          onValueChange={(value) => handleCropChange('height', value[0])}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-4 flex-wrap">
+                    <Button 
+                      variant="outline" 
+                      size="default"
+                      onClick={resetCrop}
+                      className="flex-1 h-12"
+                    >
+                      <RotateCcw className="h-5 w-5 mr-2" />
+                      Reset
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="default"
+                      onClick={() => handleCropChange('rotation', cropSettings.rotation + 90)}
+                      className="flex-1 h-12"
+                    >
+                      <Rotate className="h-5 w-5 mr-2" />
+                      Rotate 90°
+                    </Button>
+                  </div>
+                  
+                  <Button 
+                    size="lg"
+                    onClick={handleSaveCroppedPhoto}
+                    disabled={!uploadedImage}
+                    className="w-full h-14 text-lg bg-primary text-white hover:bg-primary/90"
+                  >
+                    <Save className="h-5 w-5 mr-2" />
+                    Save Cropped Photo
+                  </Button>
+
+                  {/* Live Crop Preview */}
+                  <div className="mt-8 p-6 bg-gray-50 dark:bg-slate-800 rounded-lg">
+                    <Label className="text-lg font-medium mb-4 block">Live Preview</Label>
+                    <div 
+                      ref={cropPreviewRef}
+                      className="relative mx-auto bg-white dark:bg-slate-900 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded select-none" 
+                      style={{ 
+                        width: '180px', 
+                        height: `${180 * (photoSettings.height / photoSettings.width)}px`,
+                        maxHeight: '240px'
+                      }}
+                    >
+                      {uploadedImage && (
+                        <div className="absolute inset-0 overflow-hidden rounded">
+                          <img
+                            src={`/api/images/${uploadedImage.filename}`}
+                            alt="Crop preview"
+                            className="absolute pointer-events-none"
+                            style={{
+                              transform: `
+                                scale(${cropSettings.scale}) 
+                                rotate(${cropSettings.rotation}deg)
+                              `,
+                              transformOrigin: 'center',
+                              width: '100%',
+                              height: '100%',
+                              left: '0%',
+                              top: '0%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                          {/* Interactive Crop frame overlay */}
+                          <div 
+                            className="absolute border-2 border-blue-500 dark:border-blue-400 bg-blue-500 bg-opacity-10 cursor-move"
+                            style={{
+                              left: `${(100 - cropSettings.width) / 2 + cropSettings.x / 2}%`,
+                              top: `${(100 - cropSettings.height) / 2 + cropSettings.y / 2}%`,
+                              width: `${cropSettings.width}%`,
+                              height: `${cropSettings.height}%`,
+                            }}
+                            onMouseDown={handleCropStart}
+                            onTouchStart={handleCropStart}
+                          >
+                            <div className="absolute -top-6 left-0 text-xs text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-800 px-2 py-1 rounded pointer-events-none">
+                              Drag to Move
+                            </div>
+                            
+                            {/* Resize handles */}
+                            <div 
+                              className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 border border-white dark:border-slate-800 cursor-nw-resize"
+                              onMouseDown={(e) => handleResizeStart(e, 'top-left')}
+                              onTouchStart={(e) => handleResizeStart(e, 'top-left')}
+                            />
+                            <div 
+                              className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 border border-white dark:border-slate-800 cursor-ne-resize"
+                              onMouseDown={(e) => handleResizeStart(e, 'top-right')}
+                              onTouchStart={(e) => handleResizeStart(e, 'top-right')}
+                            />
+                            <div 
+                              className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 border border-white dark:border-slate-800 cursor-sw-resize"
+                              onMouseDown={(e) => handleResizeStart(e, 'bottom-left')}
+                              onTouchStart={(e) => handleResizeStart(e, 'bottom-left')}
+                            />
+                            <div 
+                              className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 border border-white dark:border-slate-800 cursor-se-resize"
+                              onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
+                              onTouchStart={(e) => handleResizeStart(e, 'bottom-right')}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Background Settings */}
+          <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <div className="bg-gradient-primary p-2 rounded-lg mr-3 shadow-primary">
+                  <Palette className="text-white h-5 w-5" />
+                </div>
+                Background & Style
+              </h2>
+              
+              <div className="space-y-6">
+                {/* Background Removal */}
+                <div className="flex items-center justify-between p-4 border rounded-lg dark:border-slate-600">
+                  <div>
+                    <Label htmlFor="removeBackground" className="text-sm font-medium">AI Background Removal</Label>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
+                      Automatically remove background and replace with solid color
+                    </p>
+                  </div>
+                  <Switch
+                    id="removeBackground"
+                    checked={backgroundSettings.removeBackground}
+                    onCheckedChange={(checked) => 
+                      setBackgroundSettings(prev => ({ ...prev, removeBackground: checked }))
+                    }
+                  />
+                </div>
+
+                {/* Background Color */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Background Color</Label>
+                  <div className="flex items-center space-x-3">
+                    <div 
+                      className="w-10 h-10 rounded border-2 border-gray-300 dark:border-slate-600 cursor-pointer"
+                      style={{ backgroundColor: backgroundSettings.backgroundColor }}
+                      onClick={() => document.getElementById('colorPicker')?.click()}
+                    />
+                    <input
+                      id="colorPicker"
+                      type="color"
+                      value={backgroundSettings.backgroundColor}
+                      onChange={(e) => setBackgroundSettings(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                      className="hidden"
+                    />
+                    <Input
+                      type="text"
+                      value={backgroundSettings.backgroundColor}
+                      onChange={(e) => setBackgroundSettings(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                      className="flex-1 font-mono text-sm"
+                      placeholder="#ffffff"
+                    />
+                  </div>
+                  
+                  {/* Color Presets */}
+                  <div className="grid grid-cols-6 gap-2 mt-3">
+                    {['#ffffff', '#f8f9fa', '#e9ecef', '#dee2e6', '#adb5bd', '#6c757d'].map((color) => (
+                      <button
+                        key={color}
+                        className="w-8 h-8 rounded border-2 border-gray-300 dark:border-slate-600 hover:scale-110 transition-transform"
+                        style={{ backgroundColor: color }}
+                        onClick={() => setBackgroundSettings(prev => ({ ...prev, backgroundColor: color }))}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Border Width */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Border Width: {borderWidth}mm</Label>
+                  <Slider
+                    min={0}
+                    max={5}
+                    step={0.5}
+                    value={[borderWidth]}
+                    onValueChange={(value) => setBorderWidth(value[0])}
+                    className="mt-1"
+                  />
+                </div>
+
+                {/* Apply Background Settings */}
+                {uploadedImage && (
+                  <Button
+                    onClick={() => {
+                      if (backgroundSettings.removeBackground) {
+                        backgroundRemovalMutation.mutate({
+                          imageId: uploadedImage.id,
+                          backgroundColor: backgroundSettings.backgroundColor
+                        });
+                      }
+                    }}
+                    disabled={backgroundRemovalMutation.isPending}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  >
+                    {backgroundRemovalMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Scissors className="h-4 w-4 mr-2" />
+                        Apply Background Settings
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions & Export */}
+          <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <div className="bg-gradient-primary p-2 rounded-lg mr-3 shadow-primary">
+                  <Download className="text-white h-5 w-5" />
+                </div>
+                Export & Actions
+              </h2>
+              
+              <div className="space-y-4">
+                {/* Download Options */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleDownloadPdf}
+                    disabled={!layoutResult || downloadPdfMutation.isPending}
+                    className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
+                  >
+                    {downloadPdfMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PDF
+                      </>
+                    )}
+                  </Button>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={() => handleDownloadImage('png')}
+                      disabled={!layoutResult}
+                      variant="outline"
+                      className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-600/50 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/40 dark:hover:to-blue-700/40 text-blue-700 dark:text-blue-300"
+                    >
+                      <Download className="mr-1 h-4 w-4" />
+                      PNG
+                    </Button>
+                    <Button
+                      onClick={() => handleDownloadImage('jpg')}
+                      disabled={!layoutResult}
+                      variant="outline"
+                      className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-green-200 dark:border-green-600/50 hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/40 dark:hover:to-green-700/40 text-green-700 dark:text-green-300"
+                    >
+                      <Download className="mr-1 h-4 w-4" />
+                      JPG
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Reset */}
+                <div className="border-t pt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleReset}
+                    className="w-full text-gray-600 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Reset All Settings
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Additional Native Banner in right panel */}
+          <Card className="shadow-card dark:shadow-slate-900/50 border-0 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm dark:backdrop-blur-md">
+            <CardContent className="p-4">
+              <NativeBanner />
+            </CardContent>
+          </Card>
+        </div>
+
       </div>
     </div>
   );
