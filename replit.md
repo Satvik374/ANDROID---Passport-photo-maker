@@ -178,17 +178,54 @@ The application now features complete Google authentication through Replit's sec
 - ✓ Frontend test interface available at /test-email route for demonstration
 - ✓ Zero external dependencies - works immediately on project remix
 
+### Two-Step Registration Process & OTP Flow Fix (August 11, 2025)
+- ✓ Implemented secure two-step registration preventing premature account creation
+- ✓ Added `pending_registrations` table to temporarily store unverified signup data
+- ✓ User accounts are now created only AFTER successful OTP verification
+- ✓ Fixed issue where incomplete registrations left "ghost" accounts in the database
+- ✓ Enhanced registration flow prevents "account already exists" errors for unverified emails
+- ✓ Users can re-attempt registration if they didn't complete OTP verification
+- ✓ Proper cleanup of pending registrations after successful verification
+- ✓ Maintained backwards compatibility with existing verified user accounts
+
+The registration system now follows a proper two-step process:
+1. User submits registration → Data stored in `pending_registrations` table + OTP sent
+2. User verifies OTP → Actual user account created in `users` table + pending record deleted
+
+This prevents the previous issue where users would see "account already exists" if they didn't complete OTP verification on their first attempt. Users can now safely re-register with the same email if their previous attempt was not completed, and only verified accounts are considered "existing" for duplicate prevention.
+
 The email system works instantly when someone remixes this project. Users can configure Gmail or SMTP credentials for real emails, or rely on console output for development. The system includes beautiful HTML email templates and graceful fallbacks, ensuring verification codes are always accessible whether through email delivery or console logs.
 
 The secrets management system ensures new users can run the project immediately on first startup, with automatic configuration of all available services and clear guidance for optional features. When someone remixes this project, all core secrets (database, session, Remove.bg API keys) are automatically configured, making the application instantly functional.
 
-### Performance & User Experience Fixes (August 3, 2025)
-- ✓ Fixed frequent loading screens issue by implementing 3-second debounced preview updates
-- ✓ Added visual "Changes pending..." indicators with manual "Update Now" button for better user control
-- ✓ Resolved guest authentication issues where "try as guest" functionality failed
-- ✓ Fixed guest user upload failures by implementing automatic guest user database record creation
-- ✓ Resolved foreign key constraint violations for guest users during image upload
-- ✓ Enhanced dark mode styling consistency across preview sections and upload interface
-- ✓ Fixed dark mode text visibility issues in photo settings controls and labels
-- ✓ Updated "Distance from top" control to support range from 0mm to 20mm (previously 5mm to 50mm)
-- ✓ Improved schema validation to accept new topMargin range requirements
+## Environment Variables Configuration (January 30, 2025)
+
+### Current Setup Status
+- ✅ **Database**: PostgreSQL fully configured and operational
+- ✅ **Authentication**: Guest login working, Google OAuth credentials provided
+- ✅ **Background Removal**: 10 Remove.bg API keys configured with failover
+- ✅ **Email Service**: Gmail SMTP configured for verification emails
+- ✅ **Session Management**: Secure session secrets auto-generated
+- ✅ **Mobile Responsive**: Header buttons optimized for mobile devices
+- ❌ **Mailjet Service**: Removed per user request - using Gmail SMTP only
+
+### Complete Environment Variables List
+The application uses the following environment variables (see .env.example for full configuration):
+
+**Core Required:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `SESSION_SECRET` - Session encryption key (auto-generated)
+- `REPLIT_APP_URL` - Application URL for OAuth redirects
+
+**Background Removal (10 keys for redundancy):**
+- `REMOVE_BG_API_KEY_1` through `REMOVE_BG_API_KEY_10`
+
+**Authentication:**
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+
+**Email Service:**
+- `GMAIL_USER` - Gmail address for SMTP
+- `GMAIL_APP_PASSWORD` - Gmail app-specific password
+
+All secrets are managed through Replit's secure environment system with automatic fallbacks and graceful degradation when optional services aren't configured.
