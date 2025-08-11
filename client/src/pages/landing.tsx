@@ -9,6 +9,9 @@ import { FaGoogle } from "react-icons/fa";
 import { EmailSignup } from "@/components/auth/EmailSignup.tsx";
 import { EmailLogin } from "@/components/auth/EmailLogin.tsx";
 import { LoadingScreen, PageTransition } from "@/components/ui/loading-screen";
+import { NativeBanner } from "@/components/AdBanner";
+import { SidebarAdBanner } from "@/components/SidebarAdBanner";
+import { HighPerformanceBanner } from "@/components/HighPerformanceBanner";
 
 export default function Landing() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -60,7 +63,36 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted relative">
+      {/* Left Sidebar Ad */}
+      <SidebarAdBanner 
+        position="left"
+        containerId="container-e1ff802a0bf99100990e2f442ac0d82e-left"
+        scriptSrc="https://pl27394978.profitableratecpm.com/e1ff802a0bf99100990e2f442ac0d82e/invoke.js"
+      />
+
+      {/* Right Sidebar Ad */}
+      <SidebarAdBanner 
+        position="right"
+        containerId="container-e1ff802a0bf99100990e2f442ac0d82e-right"
+        scriptSrc="https://pl27394978.profitableratecpm.com/e1ff802a0bf99100990e2f442ac0d82e/invoke.js"
+      />
+
+      {/* High Performance Banner - Left */}
+      <HighPerformanceBanner 
+        position="left"
+        bannerId="hp-banner-left"
+      />
+
+      {/* High Performance Banner - Right */}
+      <HighPerformanceBanner 
+        position="right"
+        bannerId="hp-banner-right"
+      />
+
+      {/* Native Banner at top */}
+      <NativeBanner />
+
       {/* Loading Screen Overlay */}
       {isLoading && (
         <LoadingScreen 
@@ -73,26 +105,40 @@ export default function Landing() {
       {/* Header */}
       <header className="bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border-b border-border/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-primary p-2 rounded-xl shadow-primary">
                 <Camera className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 Passport Photo Creator
               </h1>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
               <ThemeToggle />
-              <Button onClick={handleGuestLogin} variant="outline" className="border-primary/30 hover:bg-primary/10">
-                Continue as Guest
+              <Button 
+                onClick={handleGuestLogin} 
+                variant="outline" 
+                size="sm"
+                className="border-primary/30 hover:bg-primary/10 text-xs sm:text-sm px-3 py-2"
+              >
+                <span className="hidden sm:inline">Continue as </span>Guest
               </Button>
-              <Button onClick={handleEmailAuth} variant="outline" className="border-primary/30 hover:bg-primary/10">
-                <Mail className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={handleEmailAuth} 
+                variant="outline" 
+                size="sm"
+                className="border-primary/30 hover:bg-primary/10 text-xs sm:text-sm px-3 py-2"
+              >
+                <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Email
               </Button>
-              <Button onClick={handleGoogleLogin} className="bg-gradient-primary hover:shadow-primary transition-all">
-                <FaGoogle className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={handleGoogleLogin} 
+                size="sm"
+                className="bg-gradient-primary hover:shadow-primary transition-all text-xs sm:text-sm px-3 py-2"
+              >
+                <FaGoogle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Google
               </Button>
             </div>
@@ -101,7 +147,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-44 py-8 sm:py-16">
         {/* Hero */}
         <div className="text-center mb-16">
           <div className="mb-8">
@@ -111,40 +157,40 @@ export default function Landing() {
                 AI-Powered Photo Processing
               </span>
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-slate-100 mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-slate-100 mb-6 leading-tight">
               Professional Passport Photos
               <br />
               <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 In Minutes
               </span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-slate-400 mb-8 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-slate-400 mb-8 max-w-3xl mx-auto px-4">
               Create perfect passport photos with AI background removal, custom sizing, and professional layouts. 
               Save time and money with our automated photo processing.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-2xl mx-auto px-4">
               <Button 
                 onClick={handleGoogleLogin} 
                 size="lg" 
-                className="bg-gradient-primary hover:shadow-primary transition-all px-8 py-4 text-lg"
+                className="bg-gradient-primary hover:shadow-primary transition-all px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
               >
-                <FaGoogle className="h-5 w-5 mr-3" />
+                <FaGoogle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                 Get Started with Google
               </Button>
               <Button 
                 onClick={() => { setAuthMode('signup'); handleEmailAuth(); }} 
                 size="lg" 
                 variant="outline"
-                className="border-primary/30 hover:bg-primary/10 px-8 py-4 text-lg"
+                className="border-primary/30 hover:bg-primary/10 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
               >
-                <UserPlus className="h-5 w-5 mr-3" />
+                <UserPlus className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                 Create Account
               </Button>
               <Button 
                 onClick={handleGuestLogin} 
                 size="lg" 
                 variant="ghost"
-                className="hover:bg-primary/5 px-8 py-4 text-lg"
+                className="hover:bg-primary/5 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
               >
                 Try as Guest
               </Button>
@@ -247,6 +293,10 @@ export default function Landing() {
               <FaGoogle className="h-5 w-5 mr-3" />
               Sign in with Google
             </Button>
+            
+            <div className="mt-2 text-xs text-gray-500 dark:text-slate-400 text-center max-w-md mx-auto">
+              <p>If you see "This app isn't verified" or "blocked by Google's policies", click "Advanced" → "Go to workspace.jijosem565.repl.co (unsafe)" to continue.</p>
+            </div>
             <Button 
               onClick={() => { setAuthMode('login'); handleEmailAuth(); }} 
               size="lg" 
@@ -321,6 +371,10 @@ export default function Landing() {
                 <FaGoogle className="h-4 w-4 mr-2" />
                 Continue with Google
               </Button>
+              
+              <div className="mt-2 text-xs text-gray-500 dark:text-slate-400 text-center">
+                <p>If blocked by Google, click "Advanced" → "Go to workspace.jijosem565.repl.co (unsafe)"</p>
+              </div>
               
               <Button 
                 onClick={handleGuestLogin} 

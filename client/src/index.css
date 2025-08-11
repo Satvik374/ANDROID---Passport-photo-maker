@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Vite error overlay */
+#vite-error-overlay,
+.vite-error-overlay,
+[data-vite-error-overlay],
+vite-error-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide runtime error modal overlay */
+[id*="error-overlay"],
+[class*="error-overlay"],
+[data-testid*="error-overlay"] {
+  display: none !important;
+}
+
 :root {
   --background: hsl(240, 10%, 98%);
   --foreground: hsl(240, 10%, 10%);

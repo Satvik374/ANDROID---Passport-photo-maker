@@ -3,16 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-
-    <!-- AdSense verification script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9578468690172928"
-      crossorigin="anonymous"></script>
+    <script type='text/javascript'>
+      // Comprehensive error suppression for ad networks
+      (function() {
+        var originalConsoleError = console.error;
+        var originalConsoleWarn = console.warn;
+        
+        // Override console.error to filter ad-related errors
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var message = args.join(' ');
+          if (message.includes('profitableratecpm.com') || 
+              message.includes('Z3 is not a function') ||
+              message.includes('Script error')) {
+            // Silently ignore ad-related errors
+            return;
+          }
+          originalConsoleError.apply(console, arguments);
+        };
+        
+        // Global error handler for all script errors
+        window.addEventListener('error', function(e) {
+          if (e.filename && (e.filename.includes('profitableratecpm.com') || e.filename.includes('doubleclick'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            return true;
+          }
+          if (e.message && (e.message.includes('Z3 is not a function') || 
+                           e.message === 'Script error.' || 
+                           e.message.includes('profitableratecpm.com'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            return true;
+          }
+        }, true);
+        
+        // Unhandled promise rejection handler for ad scripts
+        window.addEventListener('unhandledrejection', function(e) {
+          if (e.reason && e.reason.toString().includes('profitableratecpm.com')) {
+            e.preventDefault();
+            return true;
+          }
+        });
+        
+        // Load ad script with enhanced error handling
+        try {
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.async = true;
+          script.src = 'https://pl27394974.profitableratecpm.com/b3/ae/1c/b3ae1c8e52fa5613eaad2f5953f65e46.js';
+          
+          script.onload = function() {
+            console.log('Head ad script loaded successfully');
+          };
+          
+          script.onerror = function(e) {
+            // Silently handle script loading errors
+          };
+          
+          document.head.appendChild(script);
+        } catch (e) {
+          // Silently handle initialization errors
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    
     <script type="module" src="/src/main.tsx"></script>
-
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>

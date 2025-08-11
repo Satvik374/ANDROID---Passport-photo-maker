@@ -12,12 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PhotoSettings, UploadedImage, LayoutResult, Preset, CropSettings, BackgroundSettings } from "@shared/schema";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Upload, Settings, FileText, Download, RotateCcw, Search, SearchCheck, Image, Loader2, ZoomIn, ZoomOut, RotateCw, Save, Trash2, BookOpen, Crop, Move, RotateCw as Rotate, Scissors, Palette, Camera, Sparkles, LogOut, History, User as UserIcon } from "lucide-react";
+import { Upload, Settings, FileText, Download, RotateCcw, Search, SearchCheck, Image, ZoomIn, ZoomOut, RotateCw, Save, Trash2, BookOpen, Crop, Move, RotateCw as Rotate, Scissors, Palette, Camera, Sparkles, LogOut, History, User as UserIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { User } from "@shared/schema";
-import { LoadingScreen, PageTransition } from "@/components/ui/loading-screen";
+import { PageTransition } from "@/components/ui/loading-screen";
 
 export default function PassportGenerator() {
   const { toast } = useToast();
@@ -59,16 +59,12 @@ export default function PassportGenerator() {
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [resizeHandle, setResizeHandle] = useState<string>('');
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [processingMessage, setProcessingMessage] = useState<string>('');
+
   const cropPreviewRef = useRef<HTMLDivElement>(null);
 
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      setIsProcessing(true);
-      setProcessingMessage("Uploading your photo...");
-      
       console.log('Uploading file:', file.name, file.size, file.type);
       const formData = new FormData();
       formData.append('image', file);
@@ -81,19 +77,15 @@ export default function PassportGenerator() {
     },
     onSuccess: (data: UploadedImage) => {
       setUploadedImage(data);
-      setProcessingMessage("Generating photo layout...");
       
       toast({
         title: "Success",
         description: "Image uploaded successfully!",
       });
       // Trigger initial layout generation
-      setTimeout(() => {
-        generateLayoutMutation.mutate({ imageId: data.id, settings: photoSettings, borderWidth, cropSettings });
-      }, 100);
+      generateLayoutMutation.mutate({ imageId: data.id, settings: photoSettings, borderWidth, cropSettings });
     },
     onError: (error) => {
-      setIsProcessing(false);
       if (isUnauthorizedError(error as Error)) {
         toast({
           title: "Unauthorized",
@@ -116,9 +108,6 @@ export default function PassportGenerator() {
   // Background removal mutation
   const backgroundRemovalMutation = useMutation({
     mutationFn: async ({ imageId, backgroundColor }: { imageId: string; backgroundColor: string }) => {
-      setIsProcessing(true);
-      setProcessingMessage("Removing background with AI...");
-      
       const response = await apiRequest('POST', '/api/remove-background', {
         imageId,
         backgroundColor
@@ -128,19 +117,15 @@ export default function PassportGenerator() {
     onSuccess: (data: { backgroundRemovedUrl: string; updatedImage: UploadedImage }) => {
       setBackgroundRemovedUrl(data.backgroundRemovedUrl);
       setUploadedImage(data.updatedImage);
-      setProcessingMessage("Regenerating layout with new background...");
       
       toast({
         title: "Success",
         description: "Background removed successfully!",
       });
       // Automatically regenerate layout with the background-removed image
-      setTimeout(() => {
-        generateLayoutMutation.mutate({ imageId: data.updatedImage.id, settings: photoSettings, borderWidth, cropSettings });
-      }, 500);
+      generateLayoutMutation.mutate({ imageId: data.updatedImage.id, settings: photoSettings, borderWidth, cropSettings });
     },
     onError: (error) => {
-      setIsProcessing(false);
       toast({
         title: "Background removal failed",
         description: error.message || "Failed to remove background",
@@ -152,21 +137,14 @@ export default function PassportGenerator() {
   // Generate layout mutation
   const generateLayoutMutation = useMutation({
     mutationFn: async ({ imageId, settings, borderWidth, cropSettings }: { imageId: string; settings: PhotoSettings; borderWidth?: number; cropSettings?: CropSettings }) => {
-      if (!isProcessing) {
-        setIsProcessing(true);
-        setProcessingMessage("Creating perfect passport layout...");
-      }
-      
       const response = await apiRequest('POST', '/api/generate-layout', { imageId, settings, borderWidth, cropSettings });
       return response.json();
     },
     onSuccess: (data: LayoutResult) => {
       setLayoutResult(data);
-      setIsProcessing(false);
       // Remove toast for automatic updates to avoid spam
     },
     onError: (error) => {
-      setIsProcessing(false);
       toast({
         title: "Generation failed",
         description: error.message || "Failed to generate layout",
@@ -178,14 +156,10 @@ export default function PassportGenerator() {
   // Download PDF mutation
   const downloadPdfMutation = useMutation({
     mutationFn: async ({ imageId, layoutId }: { imageId: string; layoutId?: string }) => {
-      setIsProcessing(true);
-      setProcessingMessage("Generating high-quality PDF...");
-      
       const response = await apiRequest('POST', '/api/generate-pdf', { imageId, layoutId });
       return response.blob();
     },
     onSuccess: (blob: Blob) => {
-      setIsProcessing(false);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -201,7 +175,6 @@ export default function PassportGenerator() {
       });
     },
     onError: (error) => {
-      setIsProcessing(false);
       toast({
         title: "Download failed",
         description: error.message || "Failed to download PDF",
@@ -213,15 +186,11 @@ export default function PassportGenerator() {
   // Download Image mutations (PNG/JPG)
   const downloadImageMutation = useMutation({
     mutationFn: async ({ imageId, format, layoutId }: { imageId: string; format: 'png' | 'jpg'; layoutId?: string }) => {
-      setIsProcessing(true);
-      setProcessingMessage(`Generating high-resolution ${format.toUpperCase()}...`);
-      
       const response = await apiRequest('POST', '/api/generate-image', { imageId, format, layoutId });
       const blob = await response.blob();
       return { blob, format };
     },
     onSuccess: ({ blob, format }: { blob: Blob; format: string }) => {
-      setIsProcessing(false);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -237,7 +206,6 @@ export default function PassportGenerator() {
       });
     },
     onError: (error) => {
-      setIsProcessing(false);
       console.error('Download image error:', error);
       toast({
         title: "Download failed",
@@ -366,11 +334,9 @@ export default function PassportGenerator() {
       
       // Regenerate layout with the new cropped image
       if (autoPreview) {
-        setTimeout(() => {
-          generateLayoutMutation.mutate({ imageId: data.id, settings: photoSettings, borderWidth, cropSettings: {
-            x: 0, y: 0, width: 100, height: 100, scale: 1, rotation: 0
-          }});
-        }, 500);
+        generateLayoutMutation.mutate({ imageId: data.id, settings: photoSettings, borderWidth, cropSettings: {
+          x: 0, y: 0, width: 100, height: 100, scale: 1, rotation: 0
+        }});
       }
       
       toast({
@@ -405,11 +371,11 @@ export default function PassportGenerator() {
 
   // Auto-generate layout when settings change (only if auto preview is enabled)
   useEffect(() => {
-    if (!uploadedImage || !autoPreview || generateLayoutMutation.isPending) return;
+    if (!uploadedImage || !autoPreview) return;
     
     const timeoutId = setTimeout(() => {
       generateLayoutMutation.mutate({ imageId: uploadedImage.id, settings: photoSettings, borderWidth, cropSettings });
-    }, 1000); // 1 second debounce to prevent flooding
+    }, 100); // Instant preview with minimal debounce
 
     return () => clearTimeout(timeoutId);
   }, [uploadedImage, photoSettings, borderWidth, cropSettings, autoPreview]);
@@ -808,15 +774,6 @@ export default function PassportGenerator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      {/* Loading Screen Overlay */}
-      {isProcessing && (
-        <LoadingScreen 
-          message={processingMessage}
-          submessage="This may take a few moments..."
-          show={true}
-        />
-      )}
-      
       {/* Header */}
       <header className="bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border-b border-border/50 dark:border-slate-700/50 shadow-card dark:shadow-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -956,13 +913,8 @@ export default function PassportGenerator() {
                           </Button>
                           <Button 
                             onClick={handleSavePreset}
-                            disabled={savePresetMutation.isPending}
                           >
-                            {savePresetMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                            ) : (
-                              <Save className="h-4 w-4 mr-1" />
-                            )}
+                            <Save className="h-4 w-4 mr-1" />
                             Save Preset
                           </Button>
                         </div>
@@ -1245,16 +1197,11 @@ export default function PassportGenerator() {
                             imageId: uploadedImage.id, 
                             backgroundColor: backgroundSettings.backgroundColor 
                           })}
-                          disabled={backgroundRemovalMutation.isPending}
                           className="w-full"
                           variant="outline"
                         >
-                          {backgroundRemovalMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          ) : (
-                            <Scissors className="h-4 w-4 mr-2" />
-                          )}
-                          {backgroundRemovalMutation.isPending ? 'Removing Background...' : 'Remove Background'}
+                          <Scissors className="h-4 w-4 mr-2" />
+                          Remove Background
                         </Button>
                       )}
 
@@ -1315,59 +1262,40 @@ export default function PassportGenerator() {
 
                   {/* Auto-update Status */}
                   <div className="text-center text-sm text-gray-600 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700/50 rounded-lg py-3 px-4">
-                    {generateLayoutMutation.isPending ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-green-600" />
-                        <span>Updating preview...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center space-x-2">
-                        <Search className="h-4 w-4 text-green-600" />
-                        <span>Preview updates automatically</span>
-                      </div>
-                    )}
+                    <div className="flex items-center justify-center space-x-2">
+                      <SearchCheck className="h-4 w-4 text-green-600" />
+                      <span>Auto-preview enabled • Real-time updates</span>
+                    </div>
                   </div>
                   
                   <div className="space-y-4">
                     <Button
                       onClick={handleDownloadPdf}
-                      disabled={!layoutResult || downloadPdfMutation.isPending}
+                      disabled={!layoutResult}
                       className="w-full bg-gradient-primary hover:opacity-90 text-white shadow-primary transition-all duration-200 transform hover:scale-[1.02]"
                     >
-                      {downloadPdfMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Download className="mr-2 h-4 w-4" />
-                      )}
+                      <Download className="mr-2 h-4 w-4" />
                       Download PDF for Printing
                     </Button>
                     
                     <div className="grid grid-cols-2 gap-3">
                       <Button 
                         onClick={() => handleDownloadImage('png')}
-                        disabled={!layoutResult || downloadImageMutation.isPending}
+                        disabled={!layoutResult}
                         variant="outline"
                         className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-600/50 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/40 dark:hover:to-blue-700/40 text-blue-700 dark:text-blue-300"
                       >
-                        {downloadImageMutation.isPending ? (
-                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="mr-1 h-4 w-4" />
-                        )}
+                        <Download className="mr-1 h-4 w-4" />
                         PNG
                       </Button>
                       
                       <Button 
                         onClick={() => handleDownloadImage('jpg')}
-                        disabled={!layoutResult || downloadImageMutation.isPending}
+                        disabled={!layoutResult}
                         variant="outline"
                         className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-green-200 dark:border-green-600/50 hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/40 dark:hover:to-green-700/40 text-green-700 dark:text-green-300"
                       >
-                        {downloadImageMutation.isPending ? (
-                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="mr-1 h-4 w-4" />
-                        )}
+                        <Download className="mr-1 h-4 w-4" />
                         JPG
                       </Button>
                     </div>
@@ -1638,14 +1566,10 @@ export default function PassportGenerator() {
                     <Button 
                       size="sm"
                       onClick={handleSaveCroppedPhoto}
-                      disabled={!uploadedImage || saveCroppedMutation.isPending}
+                      disabled={!uploadedImage}
                       className="bg-primary text-white hover:bg-primary/90"
                     >
-                      {saveCroppedMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4 mr-1" />
-                      )}
+                      <Save className="h-4 w-4 mr-1" />
                       Save Cropped Photo
                     </Button>
                   </div>

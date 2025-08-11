@@ -10,13 +10,23 @@ import PassportGenerator from "@/pages/passport-generator";
 import Landing from "@/pages/landing";
 import { EmailTest } from "@/components/EmailTest";
 import { LoadingScreen, NavigationLoader } from "@/components/ui/loading-screen";
+
 import { useState, useEffect } from "react";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Show loading screen during authentication check
-  if (isLoading) {
+  // Prevent page reloads by stabilizing the authentication state
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => setIsInitialLoad(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  // Show loading screen during initial authentication check only
+  if (isLoading || isInitialLoad) {
     return (
       <LoadingScreen 
         message="Initializing Application"
