@@ -142,7 +142,25 @@ export async function setupGoogleAuth(app: Express) {
 
   // Only configure Google OAuth strategy if credentials are available
   if (hasGoogleAuth) {
-    const replitAppUrl = secretsManager.getSecret('REPLIT_APP_URL') || 'https://627846c6-9a01-430d-ad44-d2681f586ed6-00-3fa36lqk65xc4.pike.replit.dev';
+    // Auto-detect current Replit URL from environment
+    let replitAppUrl = secretsManager.getSecret('REPLIT_APP_URL');
+    
+    if (!replitAppUrl) {
+      // Try to detect from REPLIT_DOMAINS environment variable
+      const replitDomains = process.env.REPLIT_DOMAINS;
+      if (replitDomains) {
+        // REPLIT_DOMAINS can contain multiple domains, use the first one
+        const domain = replitDomains.split(',')[0].trim();
+        replitAppUrl = `https://${domain}`;
+        console.log('🔧 Auto-detected Replit URL:', replitAppUrl);
+        // Save the detected URL for future use
+        secretsManager.setSecret('REPLIT_APP_URL', replitAppUrl);
+      } else {
+        // Fallback URL (this should rarely be used)
+        replitAppUrl = 'https://627846c6-9a01-430d-ad44-d2681f586ed6-00-3fa36lqk65xc4.pike.replit.dev';
+        console.log('⚠️ Using fallback Replit URL:', replitAppUrl);
+      }
+    }
     
     passport.use(new GoogleStrategy({
       clientID: googleClientId!,
