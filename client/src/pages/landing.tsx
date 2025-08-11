@@ -9,14 +9,12 @@ import { FaGoogle } from "react-icons/fa";
 import { EmailSignup } from "@/components/auth/EmailSignup.tsx";
 import { EmailLogin } from "@/components/auth/EmailLogin.tsx";
 import { LoadingScreen, PageTransition } from "@/components/ui/loading-screen";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function Landing() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const queryClient = useQueryClient();
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
@@ -34,15 +32,12 @@ export default function Landing() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Ensure cookies are included
       });
 
       if (response.ok) {
         setLoadingMessage("Welcome! Redirecting to your workspace...");
-        // Invalidate and refetch auth query to update authentication state
-        await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-        await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
-        setIsLoading(false);
+        // Refresh the page to update authentication state
+        window.location.reload();
       } else {
         console.error('Guest login failed');
         setIsLoading(false);

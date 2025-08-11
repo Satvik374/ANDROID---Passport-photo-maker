@@ -61,9 +61,7 @@ export default function PassportGenerator() {
   const [resizeHandle, setResizeHandle] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processingMessage, setProcessingMessage] = useState<string>('');
-  const [pendingUpdate, setPendingUpdate] = useState<boolean>(false);
   const cropPreviewRef = useRef<HTMLDivElement>(null);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Upload mutation
   const uploadMutation = useMutation({
@@ -405,29 +403,15 @@ export default function PassportGenerator() {
     generateLayoutMutation.mutate({ imageId: uploadedImage.id, settings: photoSettings, borderWidth, cropSettings });
   };
 
-  // Debounced auto-generate layout when settings change
+  // Auto-generate layout when settings change (only if auto preview is enabled)
   useEffect(() => {
     if (!uploadedImage || !autoPreview || generateLayoutMutation.isPending) return;
     
-    // Clear existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-    
-    // Show pending update indicator
-    setPendingUpdate(true);
-    
-    // Set new timeout with longer delay to reduce frequency
-    debounceTimeoutRef.current = setTimeout(() => {
-      setPendingUpdate(false);
+    const timeoutId = setTimeout(() => {
       generateLayoutMutation.mutate({ imageId: uploadedImage.id, settings: photoSettings, borderWidth, cropSettings });
-    }, 3000); // Increased to 3 seconds for better user experience
+    }, 1000); // 1 second debounce to prevent flooding
 
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
+    return () => clearTimeout(timeoutId);
   }, [uploadedImage, photoSettings, borderWidth, cropSettings, autoPreview]);
 
   const handleDownloadPdf = () => {
@@ -518,7 +502,12 @@ export default function PassportGenerator() {
       [property]: value
     }));
     
-    // Removed immediate preview update - let the main useEffect handle it with proper debouncing
+    // Force immediate preview update for crop changes
+    if (uploadedImage && autoPreview) {
+      setTimeout(() => {
+        generateLayoutMutation.mutate({ imageId: uploadedImage.id, settings: photoSettings, borderWidth, cropSettings: { ...cropSettings, [property]: value } });
+      }, 100);
+    }
   };
 
   // Helper function to get touch/mouse coordinates
@@ -953,7 +942,7 @@ export default function PassportGenerator() {
                             rows={3}
                           />
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-slate-300 p-3 bg-gray-50 dark:bg-slate-700 rounded">
+                        <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
                           <strong>Current settings:</strong><br />
                           Size: {photoSettings.width}×{photoSettings.height}mm<br />
                           Quantity: {photoSettings.quantity}<br />
@@ -983,7 +972,7 @@ export default function PassportGenerator() {
                 </h2>
 
                 {presets.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 dark:text-slate-400">
+                  <div className="text-center py-8 text-gray-500">
                     <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No saved presets yet.</p>
                     <p className="text-xs">Save your current settings to create your first preset.</p>
@@ -991,13 +980,13 @@ export default function PassportGenerator() {
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {presets.map((preset: Preset) => (
-                      <div key={preset.id} className="flex items-center justify-between p-3 border dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+                      <div key={preset.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                         <div className="flex-1 cursor-pointer" onClick={() => handleLoadPreset(preset)}>
-                          <div className="font-medium text-sm dark:text-slate-100">{preset.name}</div>
+                          <div className="font-medium text-sm">{preset.name}</div>
                           {preset.description && (
-                            <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">{preset.description}</div>
+                            <div className="text-xs text-gray-600 mt-1">{preset.description}</div>
                           )}
-                          <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                          <div className="text-xs text-gray-500 mt-1">
                             {preset.settings.width}×{preset.settings.height}mm • {preset.settings.quantity} photos • {preset.borderWidth}mm border
                           </div>
                         </div>
@@ -1027,62 +1016,7 @@ export default function PassportGenerator() {
                     <Settings className="text-white h-5 w-5" />
                   </div>
                   Photo Settings
-                  {pendingUpdate && (
-                    <div className="ml-auto flex items-center text-sm text-amber-600 dark:text-amber-400">
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                      Changes pending...
-                    </div>
-                  )}
                 </h2>
-                
-                {/* Manual Update Controls */}
-                <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={autoPreview}
-                      onCheckedChange={setAutoPreview}
-                      data-testid="switch-auto-preview"
-                    />
-                    <Label className="text-sm font-medium">Auto Preview</Label>
-                    {pendingUpdate && (
-                      <span className="text-xs text-amber-600 dark:text-amber-400">(in 3s)</span>
-                    )}
-                  </div>
-                  {!autoPreview && uploadedImage && (
-                    <Button
-                      onClick={handleGenerateLayout}
-                      disabled={generateLayoutMutation.isPending}
-                      size="sm"
-                      className="flex items-center"
-                      data-testid="button-manual-update"
-                    >
-                      {generateLayoutMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                      ) : (
-                        <SearchCheck className="h-4 w-4 mr-1" />
-                      )}
-                      Update Preview
-                    </Button>
-                  )}
-                  {autoPreview && uploadedImage && pendingUpdate && (
-                    <Button
-                      onClick={() => {
-                        if (debounceTimeoutRef.current) {
-                          clearTimeout(debounceTimeoutRef.current);
-                        }
-                        setPendingUpdate(false);
-                        handleGenerateLayout();
-                      }}
-                      size="sm"
-                      variant="outline"
-                      className="flex items-center"
-                      data-testid="button-update-now"
-                    >
-                      <SearchCheck className="h-4 w-4 mr-1" />
-                      Update Now
-                    </Button>
-                  )}
-                </div>
                 
                 <div className="space-y-6">
                   {/* Dimensions */}
@@ -1197,7 +1131,7 @@ export default function PassportGenerator() {
 
                   {/* Quantity Slider */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700 mb-3 flex items-center justify-between">
                       <span>Photos per A4 page</span>
                       <span className="text-primary font-semibold">{photoSettings.quantity}</span>
                     </Label>
@@ -1209,7 +1143,7 @@ export default function PassportGenerator() {
                       step={1}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>1</span>
                       <span>20</span>
                     </div>
@@ -1217,7 +1151,7 @@ export default function PassportGenerator() {
 
                   {/* Photo Spacing Slider */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700 mb-3 flex items-center justify-between">
                       <span>Distance between photos</span>
                       <span className="text-primary font-semibold">{photoSettings.spacing}mm</span>
                     </Label>
@@ -1229,7 +1163,7 @@ export default function PassportGenerator() {
                       step={1}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>0mm</span>
                       <span>20mm</span>
                     </div>
@@ -1237,27 +1171,27 @@ export default function PassportGenerator() {
 
                   {/* Top Margin Slider */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700 mb-3 flex items-center justify-between">
                       <span>Distance from top</span>
                       <span className="text-primary font-semibold">{photoSettings.topMargin}mm</span>
                     </Label>
                     <Slider
                       value={[photoSettings.topMargin]}
                       onValueChange={(value) => setPhotoSettings(prev => ({ ...prev, topMargin: value[0] }))}
-                      min={0}
-                      max={20}
+                      min={5}
+                      max={50}
                       step={1}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
-                      <span>0mm</span>
-                      <span>20mm</span>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>5mm</span>
+                      <span>50mm</span>
                     </div>
                   </div>
 
                   {/* Border Width Slider */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700 mb-3 flex items-center justify-between">
                       <span>Photo border width</span>
                       <span className="text-primary font-semibold">{borderWidth}mm</span>
                     </Label>
@@ -1269,7 +1203,7 @@ export default function PassportGenerator() {
                       step={0.1}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>0mm (no border)</span>
                       <div className="flex space-x-2 text-xs">
                         <span>1mm</span>
@@ -1284,17 +1218,17 @@ export default function PassportGenerator() {
 
                   {/* Background Settings */}
                   <div className="border-t pt-6">
-                    <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-4 flex items-center">
+                    <Label className="text-sm font-medium text-gray-700 mb-4 flex items-center">
                       <Scissors className="text-primary mr-2 h-4 w-4" />
                       Background Settings
                     </Label>
                     
                     <div className="space-y-4">
                       {/* Background Removal Toggle */}
-                      <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800">
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex-1">
                           <Label className="text-sm font-medium">Remove Background</Label>
-                          <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">Use AI to automatically remove the photo background</p>
+                          <p className="text-xs text-gray-600 mt-1">Use AI to automatically remove the photo background</p>
                         </div>
                         <Switch
                           checked={backgroundSettings.removeBackground}
@@ -1326,18 +1260,18 @@ export default function PassportGenerator() {
 
                       {/* Background Removed Status */}
                       {backgroundRemovedUrl && (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 rounded-lg">
+                        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                           <div className="flex items-center">
                             <SearchCheck className="h-4 w-4 text-green-600 mr-2" />
-                            <span className="text-sm text-green-800 dark:text-green-300 font-medium">Background removed successfully!</span>
+                            <span className="text-sm text-green-800 font-medium">Background removed successfully!</span>
                           </div>
-                          <p className="text-xs text-green-700 dark:text-green-400 mt-1">All new layouts will use the background-removed image.</p>
+                          <p className="text-xs text-green-700 mt-1">All new layouts will use the background-removed image.</p>
                         </div>
                       )}
 
                       {/* Background Color Picker */}
                       <div>
-                        <Label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 flex items-center">
+                        <Label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
                           <Palette className="text-primary mr-2 h-4 w-4" />
                           Background Color
                         </Label>
@@ -1362,7 +1296,7 @@ export default function PassportGenerator() {
                             className="flex-1"
                           />
                         </div>
-                        <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           Choose the background color for removed backgrounds
                         </p>
                       </div>
@@ -1379,27 +1313,17 @@ export default function PassportGenerator() {
                   
 
 
-                  {/* Status */}
-                  <div className="text-center text-sm text-gray-600 dark:text-slate-300 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700/50 rounded-lg py-3 px-4">
+                  {/* Auto-update Status */}
+                  <div className="text-center text-sm text-gray-600 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700/50 rounded-lg py-3 px-4">
                     {generateLayoutMutation.isPending ? (
                       <div className="flex items-center justify-center space-x-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        <Loader2 className="h-4 w-4 animate-spin text-green-600" />
                         <span>Updating preview...</span>
-                      </div>
-                    ) : pendingUpdate ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
-                        <span>Changes pending update...</span>
-                      </div>
-                    ) : autoPreview ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <SearchCheck className="h-4 w-4 text-green-600" />
-                        <span>Auto preview enabled</span>
                       </div>
                     ) : (
                       <div className="flex items-center justify-center space-x-2">
-                        <Search className="h-4 w-4 text-gray-600" />
-                        <span>Manual preview mode</span>
+                        <Search className="h-4 w-4 text-green-600" />
+                        <span>Preview updates automatically</span>
                       </div>
                     )}
                   </div>
@@ -1518,7 +1442,7 @@ export default function PassportGenerator() {
               </h2>
 
               {/* A4 Canvas */}
-              <div className="relative bg-gray-50 dark:bg-slate-900 rounded-lg shadow-inner dark:shadow-slate-950/50 h-[500px] w-full overflow-auto border border-gray-200 dark:border-slate-700/50">
+              <div className="relative bg-white dark:bg-slate-900 rounded-lg shadow-inner dark:shadow-slate-950/50 h-[500px] w-full overflow-auto border dark:border-slate-700/50">
                 
                 {/* Empty State */}
                 {!layoutResult && (
@@ -1582,7 +1506,7 @@ export default function PassportGenerator() {
               {/* Crop and Position Tools */}
               {uploadedImage && (
                 <div className="mt-6 border-t pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4 flex items-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <Crop className="text-primary mr-2 h-5 w-5" />
                     Crop & Position Tools
                   </h3>
@@ -1593,7 +1517,7 @@ export default function PassportGenerator() {
                       <Label className="text-sm font-medium mb-2 block">Position</Label>
                       <div className="space-y-3">
                         <div>
-                          <Label htmlFor="cropX" className="text-xs text-gray-600 dark:text-slate-400">X Position: {cropSettings.x}%</Label>
+                          <Label htmlFor="cropX" className="text-xs text-gray-600">X Position: {cropSettings.x}%</Label>
                           <Slider
                             id="cropX"
                             min={-50}
@@ -1605,7 +1529,7 @@ export default function PassportGenerator() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="cropY" className="text-xs text-gray-600 dark:text-slate-400">Y Position: {cropSettings.y}%</Label>
+                          <Label htmlFor="cropY" className="text-xs text-gray-600">Y Position: {cropSettings.y}%</Label>
                           <Slider
                             id="cropY"
                             min={-50}
@@ -1624,7 +1548,7 @@ export default function PassportGenerator() {
                       <Label className="text-sm font-medium mb-2 block">Transform</Label>
                       <div className="space-y-3">
                         <div>
-                          <Label htmlFor="cropScale" className="text-xs text-gray-600 dark:text-slate-400">Scale: {cropSettings.scale.toFixed(2)}x</Label>
+                          <Label htmlFor="cropScale" className="text-xs text-gray-600">Scale: {cropSettings.scale.toFixed(2)}x</Label>
                           <Slider
                             id="cropScale"
                             min={0.5}
@@ -1636,7 +1560,7 @@ export default function PassportGenerator() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="cropRotation" className="text-xs text-gray-600 dark:text-slate-400">Rotation: {cropSettings.rotation}°</Label>
+                          <Label htmlFor="cropRotation" className="text-xs text-gray-600">Rotation: {cropSettings.rotation}°</Label>
                           <Slider
                             id="cropRotation"
                             min={-180}
@@ -1654,7 +1578,7 @@ export default function PassportGenerator() {
                   {/* Crop Size Controls */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <Label htmlFor="cropWidth" className="text-xs text-gray-600 dark:text-slate-400">Crop Width: {cropSettings.width}%</Label>
+                      <Label htmlFor="cropWidth" className="text-xs text-gray-600">Crop Width: {cropSettings.width}%</Label>
                       <Slider
                         id="cropWidth"
                         min={20}
@@ -1666,7 +1590,7 @@ export default function PassportGenerator() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="cropHeight" className="text-xs text-gray-600 dark:text-slate-400">Crop Height: {cropSettings.height}%</Label>
+                      <Label htmlFor="cropHeight" className="text-xs text-gray-600">Crop Height: {cropSettings.height}%</Label>
                       <Slider
                         id="cropHeight"
                         min={20}

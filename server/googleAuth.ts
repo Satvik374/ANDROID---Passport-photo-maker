@@ -69,34 +69,6 @@ export async function setupGoogleAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure passport serialization (required for all auth methods)
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id: string, done) => {
-    try {
-      // Handle guest users
-      if (id.startsWith('guest_')) {
-        const guestUser = {
-          id,
-          email: null,
-          firstName: "Guest",
-          lastName: "User",
-          profileImageUrl: null,
-          isGuest: true
-        };
-        return done(null, guestUser);
-      }
-
-      // Handle regular authenticated users
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error, null);
-    }
-  });
-
   // Only configure Google OAuth strategy if credentials are available
   if (hasGoogleAuth) {
     passport.use(new GoogleStrategy({
@@ -127,6 +99,34 @@ export async function setupGoogleAuth(app: Express) {
       return done(error, null);
     }
   }));
+
+  // Serialize/deserialize user for sessions
+  passport.serializeUser((user: any, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      // Handle guest users
+      if (id.startsWith('guest_')) {
+        const guestUser = {
+          id,
+          email: null,
+          firstName: "Guest",
+          lastName: "User",
+          profileImageUrl: null,
+          isGuest: true
+        };
+        return done(null, guestUser);
+      }
+
+      // Handle regular authenticated users
+      const user = await storage.getUser(id);
+      done(null, user);
+    } catch (error) {
+      done(error, null);
+    }
+  });
 
     // Google OAuth routes (only if Google Auth is enabled)
     app.get("/api/login", 

@@ -124,30 +124,6 @@ export class DatabaseStorage implements IStorage {
   }
   async saveUploadedImage(image: InsertUploadedImage): Promise<UploadedImage> {
     const id = randomUUID();
-    
-    // Handle guest users - ensure they exist in the users table
-    if (image.userId && image.userId.startsWith('guest_')) {
-      try {
-        // Try to create guest user if not exists
-        await db
-          .insert(users)
-          .values({
-            id: image.userId,
-            email: null,
-            firstName: "Guest",
-            lastName: "User",
-            profileImageUrl: null,
-            isGuest: true,
-            authProvider: "guest",
-            isEmailVerified: false
-          })
-          .onConflictDoNothing();
-      } catch (error) {
-        // Guest user might already exist, that's fine
-        console.log('Guest user creation (expected for existing guests):', error);
-      }
-    }
-    
     const [uploadedImage] = await db
       .insert(uploadedImages)
       .values({ ...image, id })
