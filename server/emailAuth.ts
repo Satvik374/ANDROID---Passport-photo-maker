@@ -2,6 +2,9 @@ import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { storage } from './storage';
 import { EmailService } from './emailService';
+import { db } from './db';
+import { pendingRegistrations } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 import type { EmailSignup, EmailLogin, User } from '@shared/schema';
 
 export class EmailAuthService {
@@ -19,36 +22,34 @@ export class EmailAuthService {
   // Register new user with email
   static async registerUser(signupData: EmailSignup): Promise<{ success: boolean; message: string; userId?: string }> {
     try {
-      // Check if user already exists
+      // Check if user already exists (verified user)
       const existingUser = await storage.getUserByEmail(signupData.email);
-      if (existingUser) {
+      if (existingUser && existingUser.isEmailVerified) {
         return { success: false, message: 'An account with this email already exists' };
+      }
+      
+      // If there's an unverified account, allow re-registration by deleting it
+      if (existingUser && !existingUser.isEmailVerified) {
+        // Delete the unverified user and any pending verification codes
+        await storage.updateUser(existingUser.id, { email: `deleted_${existingUser.id}@temp.com` });
+        console.log('Removed unverified account for re-registration:', signupData.email);
       }
 
       // Hash the password
       const passwordHash = await this.hashPassword(signupData.password);
 
-      // Create user (not verified yet)
-      const user = await storage.createUser({
-        id: randomUUID(),
+      // Generate verification code
+      const verificationCode = EmailService.generateVerificationCode();
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+      // Store pending registration (NOT creating user account yet)
+      await storage.savePendingRegistration({
         email: signupData.email,
         firstName: signupData.firstName,
         lastName: signupData.lastName,
         passwordHash,
-        authProvider: 'email',
-        isEmailVerified: false,
-        isGuest: false,
-      });
-
-      // Generate and send verification code
-      const verificationCode = EmailService.generateVerificationCode();
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-      await storage.saveEmailVerification({
-        email: signupData.email,
         verificationCode,
         expiresAt,
-        used: false,
       });
 
       // Send verification email
@@ -60,8 +61,7 @@ export class EmailAuthService {
 
       return { 
         success: true, 
-        message: 'Account created! Please check your email for the verification code.',
-        userId: user.id 
+        message: 'Please check your email for the verification code to complete registration.',
       };
     } catch (error) {
       console.error('Registration error:', error);
@@ -72,24 +72,26 @@ export class EmailAuthService {
   // Verify email with code
   static async verifyEmail(email: string, code: string): Promise<{ success: boolean; message: string; user?: User }> {
     try {
-      // Find valid verification code
-      const verification = await storage.getEmailVerification(email, code);
-      if (!verification) {
+      // Find valid pending registration
+      const pendingRegistration = await storage.getPendingRegistration(email, code);
+      if (!pendingRegistration) {
         return { success: false, message: 'Invalid or expired verification code' };
       }
 
-      // Mark verification as used
-      await storage.markEmailVerificationAsUsed(verification.id);
-
-      // Update user as verified
-      const user = await storage.getUserByEmail(email);
-      if (!user) {
-        return { success: false, message: 'User not found' };
-      }
-
-      const updatedUser = await storage.updateUser(user.id, {
-        isEmailVerified: true,
+      // Create the actual user account now that email is verified
+      const user = await storage.createUser({
+        id: randomUUID(),
+        email: pendingRegistration.email,
+        firstName: pendingRegistration.firstName,
+        lastName: pendingRegistration.lastName,
+        passwordHash: pendingRegistration.passwordHash,
+        authProvider: 'email',
+        isEmailVerified: true, // Already verified
+        isGuest: false,
       });
+
+      // Clean up pending registration
+      await storage.deletePendingRegistration(email);
 
       // Send welcome email
       await EmailService.sendWelcomeEmail(email, user.firstName || 'User');
@@ -97,7 +99,7 @@ export class EmailAuthService {
       return { 
         success: true, 
         message: 'Email verified successfully! Welcome to Passport Photo Maker.',
-        user: updatedUser 
+        user 
       };
     } catch (error) {
       console.error('Email verification error:', error);
@@ -108,26 +110,38 @@ export class EmailAuthService {
   // Resend verification code
   static async resendVerificationCode(email: string): Promise<{ success: boolean; message: string }> {
     try {
-      // Check if user exists and is not verified
+      // Check if there's a verified user with this email
       const user = await storage.getUserByEmail(email);
-      if (!user) {
-        return { success: false, message: 'No account found with this email address' };
-      }
-
-      if (user.isEmailVerified) {
+      if (user && user.isEmailVerified) {
         return { success: false, message: 'This email is already verified' };
       }
 
-      // Generate new verification code
+      // Check if there's a pending registration
+      const existingPending = await storage.getPendingRegistration(email, ''); // Just to check if email exists in pending
+      if (!existingPending) {
+        // If no pending registration found, try with a dummy code to get any matching record
+        const [pendingReg] = await db.select().from(pendingRegistrations).where(eq(pendingRegistrations.email, email));
+        if (!pendingReg) {
+          return { success: false, message: 'No registration found for this email. Please sign up first.' };
+        }
+      }
+
+      // Generate new verification code and update the pending registration
       const verificationCode = EmailService.generateVerificationCode();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-      await storage.saveEmailVerification({
-        email,
-        verificationCode,
-        expiresAt,
-        used: false,
-      });
+      // Get the existing pending registration to preserve other data
+      const [existingReg] = await db.select().from(pendingRegistrations).where(eq(pendingRegistrations.email, email));
+      if (existingReg) {
+        await storage.savePendingRegistration({
+          email: existingReg.email,
+          firstName: existingReg.firstName,
+          lastName: existingReg.lastName,
+          passwordHash: existingReg.passwordHash,
+          verificationCode,
+          expiresAt,
+        });
+      }
 
       // Send verification email
       const emailSent = await EmailService.sendVerificationEmail(email, verificationCode);
@@ -149,23 +163,34 @@ export class EmailAuthService {
   // Login user
   static async loginUser(loginData: EmailLogin): Promise<{ success: boolean; message: string; user?: User }> {
     try {
+      console.log('Looking up user by email:', loginData.email);
+      
       // Find user by email
       const user = await storage.getUserByEmail(loginData.email);
-      if (!user || user.authProvider !== 'email') {
-        return { success: false, message: 'Invalid email or password' };
+      console.log('User found:', !!user, user ? `ID: ${user.id}, Provider: ${user.authProvider}, Verified: ${user.isEmailVerified}` : 'none');
+      
+      if (!user) {
+        return { success: false, message: 'No account found with this email. Please sign up first.' };
+      }
+      
+      if (user.authProvider !== 'email') {
+        return { success: false, message: 'This email is registered with a different sign-in method.' };
       }
 
       // Check if email is verified
       if (!user.isEmailVerified) {
-        return { success: false, message: 'Please verify your email before logging in' };
+        return { success: false, message: 'Please verify your email before logging in. Check your inbox for the verification code.' };
       }
 
       // Verify password
       if (!user.passwordHash) {
+        console.log('User has no password hash');
         return { success: false, message: 'Invalid email or password' };
       }
 
       const passwordValid = await this.verifyPassword(loginData.password, user.passwordHash);
+      console.log('Password valid:', passwordValid);
+      
       if (!passwordValid) {
         return { success: false, message: 'Invalid email or password' };
       }
