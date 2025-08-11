@@ -1,4 +1,4 @@
-import { uploadedImages, layoutResults, presets, users, emailVerifications, type UploadedImage, type LayoutResult, type InsertUploadedImage, type InsertLayoutResult, type Preset, type InsertPreset, type User, type UpsertUser, type EmailVerification, type InsertEmailVerification } from "@shared/schema";
+import { uploadedImages, layoutResults, presets, users, emailVerifications, pendingRegistrations, type UploadedImage, type LayoutResult, type InsertUploadedImage, type InsertLayoutResult, type Preset, type InsertPreset, type User, type UpsertUser, type EmailVerification, type InsertEmailVerification, type PendingRegistration, type InsertPendingRegistration } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gt } from "drizzle-orm";
 import { randomUUID } from "crypto";
@@ -16,6 +16,12 @@ export interface IStorage {
   getEmailVerification(email: string, code: string): Promise<EmailVerification | undefined>;
   markEmailVerificationAsUsed(id: string): Promise<void>;
   deleteExpiredVerifications(): Promise<void>;
+  
+  // Pending registration operations
+  savePendingRegistration(registration: InsertPendingRegistration): Promise<PendingRegistration>;
+  getPendingRegistration(email: string, code: string): Promise<PendingRegistration | undefined>;
+  deletePendingRegistration(email: string): Promise<void>;
+  deleteExpiredPendingRegistrations(): Promise<void>;
   
   // Image operations
   saveUploadedImage(image: InsertUploadedImage): Promise<UploadedImage>;
@@ -122,6 +128,46 @@ export class DatabaseStorage implements IStorage {
         )
       );
   }
+
+  // Pending registration operations
+  async savePendingRegistration(registration: InsertPendingRegistration): Promise<PendingRegistration> {
+    // Delete any existing pending registration for this email first
+    await this.deletePendingRegistration(registration.email);
+    
+    const id = randomUUID();
+    const [pendingRegistration] = await db
+      .insert(pendingRegistrations)
+      .values({ ...registration, id })
+      .returning();
+    return pendingRegistration;
+  }
+
+  async getPendingRegistration(email: string, code: string): Promise<PendingRegistration | undefined> {
+    const [registration] = await db
+      .select()
+      .from(pendingRegistrations)
+      .where(
+        and(
+          eq(pendingRegistrations.email, email),
+          eq(pendingRegistrations.verificationCode, code),
+          gt(pendingRegistrations.expiresAt, new Date())
+        )
+      );
+    return registration;
+  }
+
+  async deletePendingRegistration(email: string): Promise<void> {
+    await db
+      .delete(pendingRegistrations)
+      .where(eq(pendingRegistrations.email, email));
+  }
+
+  async deleteExpiredPendingRegistrations(): Promise<void> {
+    await db
+      .delete(pendingRegistrations)
+      .where(eq(pendingRegistrations.expiresAt, new Date()));
+  }
+
   async saveUploadedImage(image: InsertUploadedImage): Promise<UploadedImage> {
     const id = randomUUID();
     const [uploadedImage] = await db
